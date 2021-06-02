@@ -1,7 +1,23 @@
 spring:
   application:
     name: spring-cloud-consul-producer
+  main:
+    allow-bean-definition-overriding: true
   cloud:
+    config:
+      # 对应 {label} 部分，即 Git 的分支 暂时以配置中心配置的默认分支
+      #label:
+      name: ${spring.application.name}
+      # 对应 {profile} 部分
+      profile: dev
+      #uri 直接指向配置中心服务地址，或者用discovery 指向服务名
+      #uri: http://localhost:9007
+      discovery:
+        # 开启 Config 服务发现与注册
+        enabled: true
+        # 指定 server
+        service-id: spring-cloud-consul-config
+
     consul:
       host: localhost
       port: 8500
@@ -13,6 +29,7 @@ spring:
         instance-id: ${spring.application.name}-${spring.cloud.client.ip-address}:${server.port} #实例id
         health-check-interval: 10s  #配置 Consul 健康检查频率，也就是心跳频率。
         health-check-timeout: 10s #健康检查超时
+        #如果不配置的话，默认调用actuator的health接口，如果没有引用actuator的话，consul会有一个警告之类的
         #health-check-critical-timeout: 10s #注册成功之后，如果关闭微服务，consul将检测60s,如果60s之后还检测不到此服务，将会把此服务从注册列表中移除.如果想重启consul，服务能主动注册到consul，这个参数必须注释掉！！！
 #        health-check-path: /hello/sayHello #健康检查路径
         prefer-ip-address: true #表示注册时使用IP而不是hostname
